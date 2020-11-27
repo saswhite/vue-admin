@@ -1,0 +1,1 @@
+export const RENDER_REST_LIST = 'render_rest_list';

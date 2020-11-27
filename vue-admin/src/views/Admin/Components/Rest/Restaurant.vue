@@ -21,12 +21,12 @@
         <template slot-scope="scope">
           <el-tag
             v-for="item in scope.row.tags"
-            :key="item+'1'"
+            :key="item"
             :color="colorData[parseInt(Math.random() * colorData.length)]"
             effect="dark"
             style="margin-left : 5px"
           >
-            {{ item }}
+            {{ item.toUpperCase() }}
           </el-tag>
         </template>
       </el-table-column>
@@ -48,6 +48,7 @@
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.isClose"
+            @change="handleClose($event,scope.row.clone)"
           >
           </el-switch>
         </template>
@@ -63,55 +64,86 @@
       >
       </el-pagination>
     </div>
+    <Modal />
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
+import { mapActions,mapGetters } from 'vuex';
 
 /* common */
 import { colorList } from '../../../../utils/config';
 
 /* components */
 import Breadcrumb from '../../../../components/Breadcrumb.vue';
-
-/* request */
-import { getRestaurantList } from '../../../../api/restaurant';
+import Modal from '../Modal/modal';
 
 export default {
     name:'Rest',
-    components: { Breadcrumb },
+    components: {
+        Breadcrumb,
+        Modal
+    },
     data () {
         return {
             isClose:false,
             restList:[],
             restPageData:[],
-            colorData: colorList
+            colorData: colorList,
+            restInfo:{}
         };
     },
-    created (){
+    computed:{
+        ...mapGetters('rest',{
+            restData:'restList'
+        })
+    },
+    watch:{
+        restData (){
+            this.renderRest();
+        }
+    },
+    async created (){
+        await this.setRestList();
         this.renderRest();
     },
     methods:{
-        async renderRest (){
-            let result = await getRestaurantList();
-            this.restList = _.map(result,item=>{
+        ...mapActions('modal',{
+            setShowModal:'showModal',
+            setRestInfo:'setRestInfo'
+        }),
+        ...mapActions('rest',{
+            setRestList:'renderRestList',
+            updateRestList:'updateRestList'
+        }),
+        renderRest (){
+            this.restList = _.map(this.restData,item=>{
                 let closed = item.closed ? true : false;
                 let restItem = {
                     restTitle : item.name['zh-CN'],
                     address: item.address.formatted,
                     tags: item.tags,
-                    isClose: closed
+                    isClose: closed,
+                    clone:_.cloneDeep(item)
                 };
                 return restItem;
             });
             this.restPageData = _.chunk(this.restList,10)[0];
         },
-        handleModal (scope){
-            console.log(scope);
+        async handleModal (scope){
+            await this.setRestInfo(scope.row.clone);
+            this.setShowModal(true);
         },
         handlePageChange (page){
             this.restPageData = _.chunk(this.restList,10)[page - 1];
+        },
+        handleClose (checked,item){
+            let closed = checked ? { closed:true } : null;
+            this.updateRestList({
+                ...item,
+                closed: closed
+            });
         }
     }
 };

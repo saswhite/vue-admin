@@ -71,6 +71,7 @@
 </template>
 
 <script>
+
 /* img */
 import { IMG_URL } from '../../utils/config';
 

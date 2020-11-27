@@ -9,7 +9,7 @@
 import moment from 'moment-timezone';
 
 /* common */
-import { getWeek } from '../../utils/common';
+import { getWeek } from '../utils/common';
 
 export default {
     name:'TimeInterval',
