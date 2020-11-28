@@ -15,3 +15,12 @@ export function UpdateRestInfo (newData){
     return result;
 }
 
+export function FoodList (data){
+    const result = api.get(`/food?restaurantId=${data.id}&page=${data.page}&limit=${data.limit}&keyword=${data.keyword}`);
+    return result;
+}
+
+export function UpdataFoodList (newData){
+    const result = api.post('/food',newData);
+    return result;
+}

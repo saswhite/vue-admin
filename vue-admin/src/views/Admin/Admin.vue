@@ -60,7 +60,7 @@
           Tasty后台管理系统
         </h1>
       </el-header>
-      <el-main>
+      <el-main class="main">
         <router-view />
       </el-main>
       <el-footer class="footer">
@@ -144,7 +144,6 @@ export default {
     background-clip : text;
   }
 }
-
 .collapse-btn {
   position : fixed;
   bottom : 0;
@@ -152,6 +151,11 @@ export default {
   width : 250px;
   margin : 0;
 }
+
+.main {
+  min-height : 80vh;
+}
+
 .footer {
   text-align : center;
 }
